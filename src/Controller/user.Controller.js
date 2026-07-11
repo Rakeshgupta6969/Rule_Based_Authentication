@@ -57,4 +57,44 @@ async function userRegister(req,res){
      })
 }
 
-module.exports = {userRegister};
+async function userLogin(req,res){
+   const {username,email,password} = req.body;
+   const user = await userModel.findOne({
+     $or:[
+      {email},
+      {username}
+     ]
+   })
+   if(!user){
+      res.status(401).json({
+         message:"Invalid credential",
+      })
+   }
+   const isValidPassword = await bcrypt.compare(password,user.password);
+   if(!isValidPassword){
+      res.status(401).json({
+         message:"Invalid credential",
+      })
+   }
+
+   const token = jwt.sign({
+      id:user._id,
+      role:user.role
+   },process.env.JWT_SECRET);
+   
+   res.cookie("token",token);
+
+
+   res.status(200).json({
+      message:"user loggedIn successfully",
+      user:{
+         username:user.username,
+         email:user.email,
+         password:user.password,
+         role:user.role
+      }
+   })
+
+}
+
+module.exports = {userRegister,userLogin};

@@ -7,5 +7,5 @@ const app = express();
 app.use(express.json());
 app.use(cookies_parser());
 app.use("/api/auth",authRoute);
-app.use("api/music",musicRoute);
+app.use("/api/music",musicRoute);
 module.exports = app;

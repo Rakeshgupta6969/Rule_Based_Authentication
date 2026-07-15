@@ -6,23 +6,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 async function createMusic(req,res){
-    const token = req.cookies.token;
-    if(!token){
-        return res.status(401).json({
-            message:"unauthorized hello check",
-        })
-    }
     try{
-      const decoded = await jwt.verify(token,process.env.JWT_SECRET);
-      if(decoded.role != "artist"){
-        return res.status(403).json({
-            message:"you don't have access to create music",
-        })
-      }
-    //  const artist = await userModel.findOne({
-    //     _id:decoded.id
-    //  })
-
     const title = req.body.title;
     const file = req.file;
     const result = await uploadFile(file.buffer.toString('base64'));
@@ -30,7 +14,7 @@ async function createMusic(req,res){
     const music = await musicModel.create({
         uri:result.url,
         title,
-        artist:decoded.id
+        artist:req.user.id
     })
     
     res.status(201).json({
@@ -50,26 +34,12 @@ async function createMusic(req,res){
 }
 
 async function createAlbum(req,res){
-    const token  = req.cookies.token;
-    if(!token){
-        res.status(401).json({
-            message:"unauthorized"
-        })
-    }
-
     try{
-        const decoded = await jwt.verify(token,process.env.JWT_SECRET);
-        if(decoded.role  != "artist"){
-            res.status(403).json({
-                message: "you have not access to create to album of the music only artist can create",
-            })
-        }
-
         const {title,musicId} = req.body;
         const album = await albumModel.create({
             title,
             musics:musicId,
-            artist:decoded.id
+            artist:req.user.id
            
         })
         res.status(201).json({

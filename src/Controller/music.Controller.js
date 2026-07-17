@@ -59,4 +59,19 @@ async function createAlbum(req,res){
         })
     }
 }
-module.exports = { createMusic,createAlbum };
+
+async function getAllMusic(req,res){
+    // const musics = await  musicModel.find().populate("artist"); //this give details of the  all musics along with details of their artist
+    // const musics = await  musicModel.find().populate("artist","username email");
+    const musics = await  musicModel.find();
+    if(!musics){
+        return res.status(403).json({
+            message:"musics is not found",
+        })
+    }
+    res.status(200).json({
+        message:"all musics get successfully",
+        musics:musics,
+    })
+}
+module.exports = { createMusic, createAlbum, getAllMusic};

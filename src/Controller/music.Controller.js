@@ -63,7 +63,9 @@ async function createAlbum(req,res){
 async function getAllMusic(req,res){
     // const musics = await  musicModel.find().populate("artist"); //this give details of the  all musics along with details of their artist
     // const musics = await  musicModel.find().populate("artist","username email");
-    const musics = await  musicModel.find();
+    const musics = await  musicModel.find()
+    .skip(1) // means skip the first unit of the musics and then send rest of the musics
+    .limit(10); // here meaning of the limit is you can only get at max 10 (if available on the database) music at a time
     if(!musics){
         return res.status(403).json({
             message:"musics is not found",
@@ -91,4 +93,13 @@ async function getAlbum(req,res){
     })
     
 }
-module.exports = { createMusic, createAlbum, getAllMusic,getAlbum};
+
+async function getAlbumById(req,res){
+    const AlbumId  = req.params.AlbumId;
+    const albums = await albumModel.findOne(AlbumId).populate("artist","email username").populate("musics");
+    res.status(200).json({
+        message:"albums fetched successfully",
+        albums: albums
+    })
+}
+module.exports = { createMusic, createAlbum, getAllMusic,getAlbum,getAlbumById};
